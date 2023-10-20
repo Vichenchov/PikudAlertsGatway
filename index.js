@@ -6,7 +6,7 @@ var pikudHaoref = require('pikud-haoref-api');
 require('dotenv').config();
 
 var interval = 10000;
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 const url = process.env.CONNECTION_STRING_MONGODB_ATLAS;
 let isErrorInAPI = false;
 let tempAlerts = [];
@@ -32,8 +32,8 @@ mongoose
             res.send(isErrorInAPI);
         })
 
-        app.listen(port, async () => {
-            console.log(`Server has started on port: ${port}`)
+        app.listen(PORT, async () => {
+            console.log(`Server has started on port: ${PORT}`)
             poll();
             cleanAndUpdate();
         })
@@ -77,8 +77,9 @@ var poll = function () {
             isErrorInAPI = true
             return console.log(`Retrieving active alert failed at: ${new Date()} `, err);
         }
-
         isErrorInAPI = false
+
+        console.log(alert);
 
         if (alert.type == 'missiles') {
             alert.cities.forEach(city => {
