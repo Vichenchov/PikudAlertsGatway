@@ -4,15 +4,25 @@ const bodyParser = require('body-parser');
 const alertsModule = require('./alerts.model')
 var pikudHaoref = require('pikud-haoref-api');
 require('dotenv').config();
+const cors = require('cors')
 
-var interval = 10000;
-const PORT = process.env.PORT || 3000;
+var interval = 5000;
+const PORT = process.env.PORT || 3002;
 const url = process.env.CONNECTION_STRING_MONGODB_ATLAS;
 let isErrorInAPI = false;
 let tempAlerts = [];
+let prevAlerts = [];
 
-// const router = express.Router();
 const app = express()
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST'], 
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
+
+app.get('/isErrorInAPI', (req, res) => {
+    res.send(isErrorInAPI);
+})
 
 mongoose
     .connect(url, {
@@ -23,14 +33,6 @@ mongoose
         app.use(bodyParser.urlencoded({
             extended: true
         }));
-        // router.get('/isErrorInAPI', (req, res) => {
-        //     res.send(isErrorInAPI);
-        // })
-        // app.use("/", router)
-
-        app.get('/isErrorInAPI', (req, res) => {
-            res.send(isErrorInAPI);
-        })
 
         app.listen(PORT, async () => {
             console.log(`Server has started on port: ${PORT}`)
@@ -46,12 +48,21 @@ function deleteDuplicate(data) {
     return data.filter((value, index) => data.indexOf(value) === index);
 }
 
+function removePrevAlertsFromCurrent(currentArray) {
+    return currentArray.filter(city => !prevAlerts.includes(city));
+}
+
 // save the data every 1 minute
 const cleanAndUpdate = () => {
-    setTimeout(cleanAndUpdate, 60000);
-    const cleanArray = deleteDuplicate(tempAlerts);
+    setTimeout(cleanAndUpdate, 90 * 1000);
+
+    const currentNoDuplicates = deleteDuplicate(tempAlerts);
+    const currentFinal = removePrevAlertsFromCurrent(currentNoDuplicates);
+    
+    prevAlerts = currentFinal;
+
     let now = new Date();
-    cleanArray.forEach(async city => {
+    currentFinal.forEach(async city => {
         var data = new alertsModule({
             city : city,
             time : now
