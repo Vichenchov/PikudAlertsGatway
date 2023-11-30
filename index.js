@@ -5,6 +5,7 @@ const alertsModule = require('./alerts.model')
 var pikudHaoref = require('pikud-haoref-api');
 require('dotenv').config();
 const cors = require('cors')
+const rateLimit = require('express-rate-limit');
 
 var interval = 5000;
 const PORT = process.env.PORT || 3002;
@@ -22,6 +23,15 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
 
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes - the time frame for which requests are checked
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.',
+  });
+
+  
+app.use(limiter);
+
 app.get('/isErrorInAPI', (req, res) => {
     res.send(isErrorInAPI);
 })
@@ -38,8 +48,6 @@ mongoose
 
         app.listen(PORT, async () => {
             console.log(`Server has started on port: ${PORT}`)
-            console.log(`url: ${url}`)
-            console.log(`clientServer: ${clientServer}`)
             poll();
             cleanAndUpdate();
         })
