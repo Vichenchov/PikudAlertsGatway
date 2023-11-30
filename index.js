@@ -38,6 +38,8 @@ mongoose
 
         app.listen(PORT, async () => {
             console.log(`Server has started on port: ${PORT}`)
+            console.log(`url: ${url}`)
+            console.log(`clientServer: ${clientServer}`)
             poll();
             cleanAndUpdate();
         })
