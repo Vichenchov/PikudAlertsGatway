@@ -9,13 +9,15 @@ const cors = require('cors')
 var interval = 5000;
 const PORT = process.env.PORT || 3002;
 const url = process.env.CONNECTION_STRING_MONGODB_ATLAS;
+const clientServer = process.env.CLIENT_SERVER;
+
 let isErrorInAPI = false;
 let tempAlerts = [];
 let prevAlerts = [];
 
 const app = express()
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: clientServer, 
     methods: ['GET', 'POST'], 
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
