@@ -3,12 +3,19 @@ const mongoose = require("mongoose")
 const bodyParser = require('body-parser');
 const alertsModule = require('./alerts.model')
 var pikudHaoref = require('pikud-haoref-api');
+const https = require('https');
+const fs = require('fs');
 require('dotenv').config();
 const cors = require('cors')
 const rateLimit = require('express-rate-limit');
 
+const options = {
+    key: fs.readFileSync('./server.key'), 
+    cert: fs.readFileSync('./server.cert'),  
+  };
+
 var interval = 5000;
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 443;
 const url = process.env.CONNECTION_STRING_MONGODB_ATLAS;
 const clientServer = process.env.CLIENT_SERVER;
 
@@ -17,6 +24,7 @@ let tempAlerts = [];
 let prevAlerts = [];
 
 const app = express()
+const server = https.createServer(options, app);
 app.use(cors({
     origin: clientServer, 
     methods: ['GET', 'POST'], 
@@ -46,7 +54,7 @@ mongoose
             extended: true
         }));
 
-        app.listen(PORT, async () => {
+        server.listen(PORT, async () => {
             console.log(`Server has started on port: ${PORT}`)
             poll();
             cleanAndUpdate();
