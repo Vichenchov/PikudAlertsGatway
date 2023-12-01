@@ -15,7 +15,7 @@ const options = {
   };
 
 var interval = 5000;
-const PORT = process.env.PORT || 443;
+const PORT = process.env.PORT || 3000;
 const url = process.env.CONNECTION_STRING_MONGODB_ATLAS;
 const clientServer = process.env.CLIENT_SERVER;
 
@@ -39,6 +39,10 @@ app.use(cors({
 
   
 app.use(limiter);
+
+app.get('/', function (req, res) {
+    res.status(200).send('Fuck Hamas!');
+  });
 
 app.get('/isErrorInAPI', (req, res) => {
     res.send(isErrorInAPI);
