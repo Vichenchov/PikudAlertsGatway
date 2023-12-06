@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const bodyParser = require('body-parser');
 const alertsModule = require('./alerts.model')
 var pikudHaoref = require('pikud-haoref-api');
+const moment = require('moment-timezone');
 const https = require('https');
 const fs = require('fs');
 require('dotenv').config();
@@ -85,12 +86,24 @@ const cleanAndUpdate = () => {
     
     prevAlerts = currentFinal;
 
-    let now = new Date();
     currentFinal.forEach(async city => {
+        let now = new Date(); // Get current time in UTC
+
+        const isDST = moment(now).tz('Asia/Jerusalem').isDST();
+
+        // Define the offsets for Israel's timezones (during DST and standard time)
+        const israelOffsetDST = 3; // Israel is UTC+3 during DST
+        const israelOffsetStandard = 2; // Israel is UTC+2 during standard time
+
+        // Apply the appropriate offset based on DST
+        const israelOffset = isDST ? israelOffsetDST : israelOffsetStandard;
+        now.setUTCHours(now.getUTCHours() + israelOffset);
+
         var data = new alertsModule({
             city : city,
             time : now
         });
+        
 
         await data.save().then((res) => {
         }).catch(err => {
