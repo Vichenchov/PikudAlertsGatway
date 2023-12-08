@@ -18,7 +18,6 @@ const options = {
 var interval = 5000;
 const PORT = process.env.PORT || 3000;
 const url = process.env.CONNECTION_STRING_MONGODB_ATLAS;
-// const url = "mongodb://localhost:27017/alertsFromTelegram";
 const clientServer = process.env.CLIENT_SERVER;
 
 let isErrorInAPI = false;
@@ -84,8 +83,7 @@ function removePrevAlertsFromCurrent(currentArray) {
 
 // save the data every 1 minute
 const cleanAndUpdate = () => {
-  setTimeout(cleanAndUpdate, 2000);
-  // setTimeout(cleanAndUpdate, 90 * 1000);
+  setTimeout(cleanAndUpdate, 90 * 1000);
 
   const currentNoDuplicates = deleteDuplicate(tempAlerts);
   const currentFinal = removePrevAlertsFromCurrent(currentNoDuplicates);
@@ -94,11 +92,8 @@ const cleanAndUpdate = () => {
 
   currentFinal.forEach(async (city) => {
     const now = moment().tz("Asia/Jerusalem");
-    const later = now.clone().add(4, "hours");
+    const later = now.clone().add(2, "hours");
     const time = later.toDate();
-
-    console.log(now);
-    console.log(time);
 
     var data = new alertsModule({
       city: city,
@@ -135,8 +130,6 @@ var poll = function () {
     isErrorInAPI = false;
 
     console.log(alert);
-    alert.type = "missiles";
-    alert.cities = ["ssssssssssss"];
 
     if (alert.type == "missiles") {
       alert.cities.forEach((city) => {
