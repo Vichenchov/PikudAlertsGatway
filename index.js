@@ -92,8 +92,12 @@ const cleanAndUpdate = () => {
 
   currentFinal.forEach(async (city) => {
     const now = moment().tz("Asia/Jerusalem");
+    //fixes the problem with the time saved in the db - probably because of time zones on mongo Atlas
     const later = now.clone().add(2, "hours");
-    const time = later.toDate();
+    //add the offset because I'm saving the alerts 90 seconds later
+    const earlier = later.clone().subtract(90, "seconds");
+
+    const time = earlier.toDate();
 
     var data = new alertsModule({
       city: city,
