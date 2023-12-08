@@ -102,6 +102,7 @@ const cleanAndUpdate = () => {
     var data = new alertsModule({
       city: city,
       time: time,
+      area : '' // future data
     });
 
     console.log(data);
